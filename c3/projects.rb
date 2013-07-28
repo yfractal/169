@@ -159,3 +159,35 @@ puts "\n"
 puts f.reject {|s| s.odd?}.to_s
 puts f.map{|x| x*2}.to_s
 puts "\n"
+
+
+puts "P 1,8"
+puts "pending"
+puts "\n"
+puts "p 9"
+module Enumerable
+	def each_with_flattening
+		self.each do |ele|
+			if ele.class == Array 
+				ele.each_with_flattening do |e|
+					yield e 
+				end
+			else 
+				yield ele
+			end
+		end
+	end
+end
+
+
+arr = [1,[2,3],4,[5,6],7]
+arr.each_with_flattening do |s|
+	print "#{s},"
+end
+puts "\n"
+
+arr2 = [1,[2,[3,4,[5,6],[7,8],9],10],11]
+arr2.each_with_flattening do |s|
+	print "#{s},"
+end
+# it must be array
