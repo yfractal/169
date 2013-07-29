@@ -1,4 +1,8 @@
 p "P 1"
+def should_be(test,expect)
+	puts test.to_s
+	puts "Should be " + expect.to_s
+end
 def count_instance_superclass(instance)
 	i = 0
 	c = instance.class
@@ -136,7 +140,7 @@ class FibSequence
 				i += 1
 			end
 		end
-		
+
 		if n == 1
 			@fib_sequence = [1]
 		elsif n == 2
@@ -145,6 +149,7 @@ class FibSequence
 			@fib_sequence = [1,1]
 			get_fib_sequence_from_3!()
 		end
+		
 		return @fib_sequence
 	end
 	def each
@@ -164,7 +169,7 @@ puts f.map{|x| x*2}.to_s
 puts "\n"
 
 
-puts "P 1,8"
+puts "P 7,8"
 puts "pending"
 puts "\n"
 puts "p 9"
@@ -194,3 +199,126 @@ arr2.each_with_flattening do |s|
 	print "#{s},"
 end
 # it must be array
+
+
+puts "\nP 10"
+
+module Enumerable
+	def each_permuted
+		c = []
+		# copy(self,c)
+		self.each do |e|
+			c << e
+		end
+		while not c.empty?
+			rand_index = rand * c.length
+			ele = c[rand_index]
+			yield ele
+			c.delete(ele)
+		end
+	end
+end
+
+t = (1..10).to_a
+t.each_permuted do |r|
+	puts r
+end
+puts "\nP 11"
+
+class BinaryTree
+	attr_accessor :ele,:l_child,:r_child
+	def initialize(ele,l_child = nil,r_child = nil)
+		@ele = ele
+		@l_child = l_child
+		@r_child = r_child
+	end
+
+	def empty?
+		return self == nil
+	end
+
+	def <<(ele)
+		ele = BinaryTree.new(ele)
+		curr = self
+		parent = curr
+
+		def go_left_right(compare,compared)
+			if compare.ele < compared.ele
+				return compared.l_child
+			else
+				return compared.r_child
+			end
+		end
+
+		while curr != nil
+			parent = curr
+			curr = go_left_right(ele,curr)
+		end
+
+		if ele.ele < parent.ele
+			parent.l_child = ele
+		else
+			parent.r_child = ele
+		end
+
+		return self
+	end
+
+	def each
+		if self != nil
+			if self.l_child != nil
+				self.l_child.each do |e|
+					yield e 
+				end
+			end
+
+			yield self
+
+			if self.r_child != nil
+				self.r_child.each do |e|
+					yield e 
+				end
+			end
+		end
+	end
+
+	def include?(elt)
+		self.each do |e|
+			if e.ele == elt
+				return true
+			end
+		end
+		return false
+	end
+
+
+end
+head = BinaryTree.new(10)
+head << 9 << 15 << 11 << 33 << 1
+puts "each "
+head.each do |e|
+	puts e.ele
+end
+puts should_be(head.include?(11),"true")
+puts should_be(head.include?(1111),"false")
+
+
+def receive_block(&block)
+	puts block.call(1,2)
+end
+
+receive_block do |a,b|
+	a + b
+end
+# defind a function the call it 
+
+def lam(&block)
+	block.call(1)
+end
+
+# puts lam(lambda {|x| x+ 1})
+
+r = lam do |x|
+	x + 1
+end
+puts r
