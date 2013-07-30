@@ -3,6 +3,7 @@ def should_be(test,expect)
 	puts test.to_s
 	puts "Should be " + expect.to_s
 end
+
 def count_instance_superclass(instance)
 	i = 0
 	c = instance.class
@@ -104,9 +105,6 @@ puts "pending\n"
 
 puts "P 5  Mix-ins and Iterators"
 include Enumerable
-%w(alice bob carol).each_with_index do |person,index|
-	puts ">>#{person} is number #{index}"
-end
 
 module Enumerable
 	def each_with_custom_index(start,slice)
@@ -169,7 +167,20 @@ puts f.map{|x| x*2}.to_s
 puts "\n"
 
 
-puts "P 7,8"
+puts "P 7"
+lastfib = "Suprise!"
+f = FibSequence.new(3).each do |f|
+	print lastfib
+end
+puts "f is "
+puts f.to_s
+puts "\n"
+
+f = FibSequence.new(3).each do 
+	print "Rah"
+end
+
+puts "P 8"
 puts "pending"
 puts "\n"
 puts "p 9"
@@ -282,26 +293,69 @@ class BinaryTree
 		end
 	end
 
-	def include?(elt)
+	def include?(&elt)
 		self.each do |e|
-			if e.ele == elt
+			if e.ele == elt.call
 				return true
 			end
 		end
 		return false
 	end
 
+	def all?(&block)
+		self.each do |e|
+			if not block.call(e.ele)
+				return  false
+			end
+		end
+		return true
+	end
 
+	def any?(&block)
+		self.each do |e|		
+			if block.call(e.ele)
+				return true
+			end
+		end
+		return false
+	end
 end
-head = BinaryTree.new(10)
+head = BinaryTree.new(17)
 head << 9 << 15 << 11 << 33 << 1
 puts "each "
 head.each do |e|
 	puts e.ele
 end
-puts should_be(head.include?(11),"true")
-puts should_be(head.include?(1111),"false")
+r = head.include? do 
+	11
+end
+puts should_be(r,"true")
+r2 = head.include? do 
+	111
+end
+puts "all"
+puts should_be(r2,false)
 
+r_all = head.all? do |e|
+	e % 2 == 1
+end
+should_be(r_all,"true")
+
+r_all2 = head.all? do |e |
+	e >= 10
+end
+
+should_be(r_all2,"false")
+
+puts "any?"
+r1 = head.any? do |e|
+	e >= 10
+end
+should_be(r1,true)
+r2 = head.any? do |e|
+	e % 2 == 0
+end
+should_be(r2,false)
 
 def receive_block(&block)
 	puts block.call(1,2)
